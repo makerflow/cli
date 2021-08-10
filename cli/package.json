@@ -4,6 +4,14 @@
   "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
   "private": false,
   "keywords": ["productivity", "do not disturb", "macos", "slack", "makerflow", "distraction blocker", "notification blocker", "deep work", "collaboration"],
+  "repository": {
+    "url": "https://github.com/makerflow/cli"
+  },
+  "author": {
+    "name": "Makerflow",
+    "email": "hello@makerflow.co",
+    "url": "https://makerflow.co"
+  },
   "types": "build/types/types.d.ts",
   "bin": {
     "makerflow": "bin/cli"
