@@ -1,32 +1,66 @@
 {
   "name": "makerflow-cli",
-  "version": "0.0.1",
-  "description": "Deep work and collaboration assistant for developers ",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "version": "0.0.3",
+  "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
+  "private": false,
+  "keywords": ["productivity", "do not disturb", "macos", "slack", "makerflow", "distraction blocker", "notification blocker", "deep work", "collaboration"],
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/makerflow/cli.git"
+    "url": "https://github.com/makerflow/cli"
   },
-  "keywords": [
-    "collaboration",
-    "deep",
-    "work",
-    "focus",
-    "flow",
-    "do-not-disturb",
-    "notifications",
-    "slack",
-    "github",
-    "meetings",
-    "calendar"
+  "author": {
+    "name": "Makerflow",
+    "email": "hello@makerflow.co",
+    "url": "https://makerflow.co"
+  },
+  "types": "build/types/types.d.ts",
+  "bin": {
+    "makerflow": "bin/cli"
+  },
+  "scripts": {
+    "format": "prettier --write **/*.{js,ts,tsx,json}",
+    "lint": "tslint -p .",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "prepublishOnly": "yarn build",
+    "test": "jest",
+    "watch": "jest --watch",
+    "snapupdate": "jest --updateSnapshot",
+    "coverage": "jest --coverage"
+  },
+  "files": [
+    "tsconfig.json",
+    "tslint.json",
+    "build",
+    "LICENSE",
+    "README.md",
+    "bin"
   ],
-  "author": "Vivek Ranjan",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/makerflow/cli/issues"
+  "license": "MIT",
+  "dependencies": {
+    "gluegun": "latest",
+    "keytar": "^7.7.0",
+    "mindful-timer": "^0.4.2"
   },
-  "homepage": "https://github.com/makerflow/cli#readme"
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.11",
+    "jest": "^24.1.0",
+    "prettier": "^1.12.1",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "tslint": "^5.12.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.6.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
 }
