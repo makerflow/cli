@@ -1,8 +1,9 @@
 {
   "name": "makerflow-cli",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
   "private": false,
+  "keywords": ["productivity", "do not disturb", "macos", "slack", "makerflow", "distraction blocker", "notification blocker", "deep work", "collaboration"],
   "types": "build/types/types.d.ts",
   "bin": {
     "makerflow": "bin/cli"
