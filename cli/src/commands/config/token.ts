@@ -1,6 +1,6 @@
 
 import { GluegunCommand } from 'gluegun'
-import { setPassword } from 'keytar'
+import { setPassword, getPassword, deletePassword } from 'keytar'
 
 
 const command: GluegunCommand = {
@@ -8,6 +8,18 @@ const command: GluegunCommand = {
   description: 'Set your Makerflow API token. You can get a new token from https://app.makerflow.co/settings#api',
   run: async toolbox => {
     let token = null;
+    if (toolbox.parameters.options.hasOwnProperty("check") && toolbox.parameters.options.check) {
+      const pwd = await getPassword('makerflow', 'default')
+      let passwordExists = pwd !== null && pwd.trim().length > 5
+      toolbox.print.success(passwordExists)
+      return;
+    }
+    if (toolbox.parameters.options.hasOwnProperty("delete") && toolbox.parameters.options.delete) {
+      const spinner = toolbox.print.spin('Deleting token...')
+      await deletePassword('makerflow', 'default')
+      spinner.succeed('Token deleted')
+      return;
+    }
     if (toolbox.parameters.options.hasOwnProperty("value") && toolbox.parameters.options.value) {
       token = toolbox.parameters.options.value;
     }

@@ -1,8 +1,8 @@
 {
   "name": "makerflow-cli",
   "version": "0.0.1",
-  "description": "Makerflow is deep work and collaboration assistant for developers",
-  "private": true,
+  "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
+  "private": false,
   "types": "build/types/types.d.ts",
   "bin": {
     "makerflow": "bin/cli"
@@ -25,8 +25,7 @@
     "tslint.json",
     "build",
     "LICENSE",
-    "readme.md",
-    "docs",
+    "README.md",
     "bin"
   ],
   "license": "MIT",

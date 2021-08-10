@@ -4,7 +4,7 @@ import { GluegunCommand } from 'gluegun'
 
 const command: GluegunCommand = {
   name: 'ongoing',
-  description: 'Check if a flow mode is currently ongoing',
+  description: 'Check if Flow Mode is currently ongoing',
   run: async toolbox => {
     toolbox.ongoingFlowMode();
   },
