@@ -1,9 +1,20 @@
 {
   "name": "makerflow-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
   "private": false,
-  "keywords": ["productivity", "do not disturb", "macos", "slack", "makerflow", "distraction blocker", "notification blocker", "deep work", "collaboration"],
+  "keywords": [
+    "productivity",
+    "do not disturb",
+    "macos",
+    "slack",
+    "makerflow",
+    "distraction blocker",
+    "notification blocker",
+    "deep work",
+    "collaboration",
+    "google calendar"
+  ],
   "repository": {
     "url": "https://github.com/makerflow/cli"
   },
@@ -39,9 +50,13 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "date-fns": "^2.23.0",
+    "date-fns-tz": "^1.1.6",
     "gluegun": "latest",
     "keytar": "^7.7.0",
-    "mindful-timer": "^0.4.2"
+    "lodash": "^4.17.21",
+    "mindful-timer": "^0.4.2",
+    "pluralize": "^8.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
