@@ -6,6 +6,7 @@ hiding away from your product manager, designer or other developers on the team!
 ## Features
 
 1. Easily toggle "do-not-disturb" mode on macOS.
+1. Close distracting apps like Slack, Discord, and WhatsApp (h/t [@VicVijayakumar](https://twitter.com/VicVijayakumar/status/1425590056266436610))
 1. Update your Slack status quickly to let your co-workers know when 
    1. you are trying to do deep work
    1. or, when you are on a break.
@@ -16,6 +17,8 @@ hiding away from your product manager, designer or other developers on the team!
 
 ### Pre-requisites
 
+Makerflow is currently only available for MacOS.
+
 You will need a free Makerflow account and API token to get started. Sign up or login at https://makerflow.co
 
 You can get a new token from https://app.makerflow.co/settings#api
@@ -24,7 +27,10 @@ You can get a new token from https://app.makerflow.co/settings#api
 
 To install, run `npm install -g makerflow`
 
-Once installed, run `makerflow config token` to set your API token.
+Once installed, 
+1. Run `makerflow config token` to set your API token.
+2. Run `makerflow config kill` to setup which apps are automatically killed and reopened 
+when Flow Mode is started or ended
 
 ### Usage
 
@@ -32,12 +38,18 @@ Get a list of available commands with `makerflow help`
 
 #### Flow Mode
 
-Flow Mode turns on "do-not-disturb" mode on macOS to block your notifications and 
-prevent distractions. If you have your Slack workspace connected to Makerflow, turning on 
-"Flow Mode" will automatically set your Slack status to let your teammates know you might be
-slow to respond
+Starting Flow Mode with `makerflow start`. This will: 
+1. Turn on "do-not-disturb" mode on macOS to block your notifications and 
+   prevent distractions.
+1. If you have your Slack workspace connected to Makerflow, it will automatically set your 
+   Slack status to let your teammates know you might be slow to respond.
+1. Close distracting apps like Slack, Discord, and WhatsApp, if you
+   1. Ran it with `makerflow start --kill` 
+   1. Or, configured it to do so with `makerflow config kill`
 
-To start Flow Mode, run `makerflow start` and to end it, run `makerflow stop`
+To end Flow Mode, run `makerflow stop`. This will reverse all of the actions that took place 
+when you started Flow Mode.
+
 
 #### List pending tasks
 

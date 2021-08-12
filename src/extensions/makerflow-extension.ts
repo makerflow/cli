@@ -78,6 +78,14 @@ module.exports = (toolbox: GluegunToolbox) => {
     apiTokenUnavailableMessage(error)
     if (error == null && response.status >= 200 && response.status < 300) {
       dnd.enable()
+      let config = toolbox.mfConfig()
+      if (config.alwaysKill || toolbox.parameters.options.kill) {
+        let appsToKill = config.appsToKill
+        for (const app of appsToKill) {
+          // tslint:disable-next-line:no-floating-promises
+          toolbox.system.run(`pkill ${app}`)
+        }
+      }
     }
   }
 
@@ -89,6 +97,14 @@ module.exports = (toolbox: GluegunToolbox) => {
     apiTokenUnavailableMessage(error)
     if (error === null && response.status >= 200 && response.status < 300) {
       dnd.disable()
+      let config = toolbox.mfConfig()
+      if (config.alwaysKill || toolbox.parameters.options.reopen) {
+        let appsToKill = config.appsToKill
+        for (const app of appsToKill) {
+          // tslint:disable-next-line:no-floating-promises
+          toolbox.system.run(`open /Applications/${app}.app`)
+        }
+      }
     }
   }
 
@@ -115,16 +131,15 @@ module.exports = (toolbox: GluegunToolbox) => {
       filesystem: { write, exists }
     } = toolbox
     if (!exists(CONFIG_FILENAME)) {
-      write(CONFIG_FILENAME, { local: false })
+      write(CONFIG_FILENAME, { alwaysKill: false, appsToKill: [] })
     }
     return loadConfig(brand, homedir())
   }
 
   toolbox.updateMfConfig = async (key, value) => {
-    await toolbox.patching.update(CONFIG_FILENAME, data => {
-      data[key] = value
-      return data
-    })
+    let config = toolbox.mfConfig()
+    config[key] = value
+    toolbox.filesystem.write(CONFIG_FILENAME, config)
   }
 
   toolbox.beginBreak = async () => {
