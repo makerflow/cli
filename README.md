@@ -70,7 +70,8 @@ If you pass a `--reason` argument, Makerflow will automatically set an appropria
 for you on Slack. For instance, if you run `makerflow break start --reason=lunch`, it will set 🥪 
 emoji as your status icon. If you don't supply a reason, your status will be set to ⏸.
 
-Reasons currently supported are coffee (☕️), tea (🍵), beverage (🥤), walk (👟), and lunch (🥪).
+Reasons currently supported are lunch (🥪), coffee (☕️), tea (🍵), beverage (🥤), walk (👟), run (🏃), workout (💪), 
+child (👶), and doctor (🏥).
 
 #### Events (from Google Calendar)
 
