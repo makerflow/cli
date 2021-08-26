@@ -232,6 +232,16 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
   }
 
+  toolbox.markAsDone = async (stringifiedTodo: string) => {
+    const todo = JSON.parse(stringifiedTodo)
+    if (!todo || !todo.hasOwnProperty('type')) return
+    const startingMessage = `Marking ${capitalize(todo.type).replace("_", "").replace("im", "").replace("mp", "").replace("channel", "")} | ${todo.description} | ${todo.sourceDescription} as done`
+    const successMessage = `$${capitalize(todo.type).replace("_", "").replace("im", "").replace("mp", "").replace("channel", "")} | ${todo.description} | ${todo.sourceDescription} marked as done`
+    const url = '/tasks/todo/done'
+    const { error } = await toolbox.postApi(startingMessage, url, successMessage, {todo: todo, done: true})
+    apiTokenUnavailableMessage(error)
+  }
+
   function getVideoUriFromCalendarEvent(event: any) {
     return event.conference !== null && event.conference.entryPoints.filter(e => e.entryPointType === 'video').length ? event.conference.entryPoints.filter(e => e.entryPointType === 'video')[0].uri : ''
   }

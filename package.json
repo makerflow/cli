@@ -1,7 +1,7 @@
 {
   "name": "makerflow-cli",
-  "version": "0.0.5",
-  "description": "Makerflow is deep work and collaboration assistant for developers. Signup for your FREE account at https://makerflow.co",
+  "version": "0.0.6",
+  "description": "Block distractions and get all your notifications/tasks in one place from other collaboration apps like messages from Slack and pull requests from GitHub or Bitbucket.",
   "private": false,
   "keywords": [
     "productivity",
@@ -13,7 +13,9 @@
     "notification blocker",
     "deep work",
     "collaboration",
-    "google calendar"
+    "google calendar",
+    "notification aggregator",
+    "pull requests dashboard"
   ],
   "repository": {
     "url": "https://github.com/makerflow/cli"

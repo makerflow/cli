@@ -13,11 +13,12 @@ hiding away from your product manager, designer or other developers on the team!
 1. Get a quick list of your 
    1. Slack notifications
    1. pull requests from GitHub or Bitbucket
-    1. upcoming events from Google calendar
+   1. upcoming events from Google calendar
+1. and mark them as done
 
 ### Pre-requisites
 
-Makerflow is currently only available for MacOS.
+Makerflow currently only works great on MacOS and hasn't been tested on other OS.
 
 You will need a free Makerflow account and API token to get started. Sign up or login at https://makerflow.co
 
@@ -54,6 +55,7 @@ when you started Flow Mode.
 #### List pending tasks
 
 `makerflow tasks todo` will list  notifications from Slack and pull requests from GitHub or Bitbucket
+`makerflow tasks done` to mark 1 or more tasks as done
 
 #### Breaks
 
@@ -64,11 +66,11 @@ To go on a break, run `makerflow break start` and to end it, run `makerflow brea
 
 ##### Reason for taking a break
 
-If you pass a `reason`, Makerflow will automatically set an appropriate status and emoji 
+If you pass a `--reason` argument, Makerflow will automatically set an appropriate status and emoji 
 for you on Slack. For instance, if you run `makerflow break start --reason=lunch`, it will set 🥪 
 emoji as your status icon. If you don't supply a reason, your status will be set to ⏸.
 
-Reasons currently supported are coffee (☕️), tea (🍵), beverage (🥤), and lunch (🥪).
+Reasons currently supported are coffee (☕️), tea (🍵), beverage (🥤), walk (👟), and lunch (🥪).
 
 #### Events (from Google Calendar)
 
