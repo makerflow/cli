@@ -1,4 +1,4 @@
-import { GluegunToolbox } from 'gluegun'
+import { GluegunParameters, GluegunToolbox } from 'gluegun'
 import * as dnd from '../do-not-disturb'
 import * as keytar from 'keytar'
 import { ApiResponse } from 'apisauce'
@@ -180,6 +180,13 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
   }
 
+  toolbox.filterTodosByType = (parameters: GluegunParameters, formattedTodos: any[]) => {
+    if (parameters.options.hasOwnProperty('source') && typeof parameters.options.source === 'string') {
+      formattedTodos = formattedTodos.filter(todo => todo.type.toLowerCase().indexOf(parameters.options.source.toLowerCase()) !== -1)
+    }
+    return formattedTodos
+  }
+
   toolbox.getTasksTodo = async () => {
     const startingMessage = 'Fetching your tasks'
     const url = '/tasks/todo'
@@ -191,9 +198,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       let formattedTodos = []
       if (response.data !== null && response.data.length > 0) {
         formattedTodos = response.data.map(TodoUtils.enrichTodo)
-        if (parameters.options.hasOwnProperty('source') && typeof parameters.options.source === 'string') {
-          formattedTodos = formattedTodos.filter(todo => todo.type.toLowerCase().indexOf(parameters.options.source.toLowerCase()) !== -1)
-        }
+        formattedTodos = toolbox.filterTodosByType(parameters, formattedTodos)
         if (formattedTodos.length === 0) {
           print.success('No pending tasks')
           return
