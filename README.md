@@ -30,7 +30,7 @@ To install, run `npm install -g makerflow`
 
 Once installed, 
 1. Run `makerflow config token` to set your API token.
-2. Run `makerflow config kill` to setup which apps are automatically killed and reopened 
+2. Run `makerflow config kill` to set which apps are automatically killed and reopened 
 when Flow Mode is started or ended
 
 ### Usage
@@ -48,14 +48,15 @@ Starting Flow Mode with `makerflow start`. This will:
    1. Ran it with `makerflow start --kill` 
    1. Or, configured it to do so with `makerflow config kill`
 
-To end Flow Mode, run `makerflow stop`. This will reverse all of the actions that took place 
+To end Flow Mode, run `makerflow stop`. This will reverse all the actions that took place 
 when you started Flow Mode.
 
 
 #### List pending tasks
 
-`makerflow tasks todo` will list  notifications from Slack and pull requests from GitHub or Bitbucket
-`makerflow tasks done` to mark 1 or more tasks as done
+`makerflow tasks todo` - list  notifications from Slack and pull requests from GitHub or Bitbucket.
+
+`makerflow tasks done` - mark one or more tasks as done
 
 #### Breaks
 
