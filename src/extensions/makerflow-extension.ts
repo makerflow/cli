@@ -289,5 +289,11 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
   }
 
+  toolbox.recordProductiveActivity = async () => {
+    const url = '/productive-activity'
+    const { error } = await toolbox.postApi(null, url, null, [toolbox.parameters.options.min, toolbox.parameters.options.max])
+    apiTokenUnavailableMessage(error)
+  }
+
 
 }
