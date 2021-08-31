@@ -116,10 +116,23 @@ module.exports = (toolbox: GluegunToolbox) => {
     const { print, parameters } = toolbox
     if (error === null && response.status >= 200 && response.status < 300) {
       if (parameters.options.json) return
-      if (response.data !== null && response.data.hasOwnProperty('id')) {
+      if (response.data !== null && response.data.data.hasOwnProperty('id')) {
         print.success('Flow Mode is currently ongoing')
       } else {
         print.success('No Flow Mode currently ongoing')
+      }
+    }
+  }
+
+  toolbox.toggleFlowMode = async () => {
+    const url = '/flow-mode/ongoing'
+    const { error, response } = await toolbox.getApi(null, url, null)
+    apiTokenUnavailableMessage(error)
+    if (error === null && response.status >= 200 && response.status < 300) {
+      if (response.data !== null && response.data.data.hasOwnProperty('id')) {
+        await toolbox.endFlowMode()
+      } else {
+        await toolbox.beginFlowMode()
       }
     }
   }

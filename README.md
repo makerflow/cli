@@ -39,18 +39,19 @@ Get a list of available commands with `makerflow help`
 
 #### Flow Mode
 
-Starting Flow Mode with `makerflow start`. This will: 
+To quickly toggle flow mode, run `makerflow toggle`
+
+Flow Mode will: 
 1. Turn on "do-not-disturb" mode on macOS to block your notifications and 
    prevent distractions.
 1. If you have your Slack workspace connected to Makerflow, it will automatically set your 
    Slack status to let your teammates know you might be slow to respond.
 1. Close distracting apps like Slack, Discord, and WhatsApp, if you
-   1. Ran it with `makerflow start --kill` 
-   1. Or, configured it to do so with `makerflow config kill`
+   1. Once if you ran `makerflow start --kill` or `makerflow toggle --kill`
+   1. Everytime if you configured it to do so with `makerflow config kill`
 
 To end Flow Mode, run `makerflow stop`. This will reverse all the actions that took place 
 when you started Flow Mode.
-
 
 #### List pending tasks
 
