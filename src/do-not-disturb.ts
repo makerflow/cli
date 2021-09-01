@@ -1,6 +1,6 @@
 const os = require('os')
 const dnd = require('mindful-timer/src/dnd')
-const semverParse = require('semver/functions/parse');
+const semverParse = require('semver/functions/parse')
 const fs = require('fs')
 const exec = require('child_process').exec
 
