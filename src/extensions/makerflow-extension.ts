@@ -88,7 +88,7 @@ module.exports = (toolbox: GluegunToolbox) => {
             if (output && output.trim().length > 0) {
               // tslint:disable-next-line:no-floating-promises
               toolbox.system.run(`pkill "${app}"`).then(() => {
-                toolbox.filesystem.appendAsync(pathToKilledAppsList, app);
+                toolbox.filesystem.appendAsync(pathToKilledAppsList, app).finally(() => { /* Nothing to do here */ });
               })
             }
           }).catch(() => {/* do nothing */})
@@ -115,7 +115,7 @@ module.exports = (toolbox: GluegunToolbox) => {
             toolbox.system.run(`open "/Applications/${app}.app"`)
           }
         }
-        toolbox.filesystem.removeAsync(pathToKilledAppsList)
+        toolbox.filesystem.removeAsync(pathToKilledAppsList).finally(() => { /* Nothing to do here */ })
       }
     }
   }
