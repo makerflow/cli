@@ -3,7 +3,17 @@
 Makerflow is a deep work  and collaboration assistant for developers. Get in the zone without 
 hiding away from your product manager, designer or other developers on the team!
 
-```npm install -g makerflow-cli```
+![](docs/media/toggle-demo.gif)
+
+## Table of contents
+
+1. [Features](#features)
+1. [Installation](#installation)
+1. [Usage](#usage)
+   1. [Flow Mode](#flow-mode)
+   1. [Tasks](#tasks)
+   1. [Breaks](#breaks)
+   1. [Events](#events-from-google-calendar)
 
 ## Features
 
@@ -22,11 +32,6 @@ hiding away from your product manager, designer or other developers on the team!
 1. ✅ and mark them as done (`makerflow tasks done`)
 1. 📅 See all your ongoing and upcoming [events from Google Calendar](#events-from-google-calendar) (`makerflow events list`)
 
-## Pre-requisites
-
-1. MacOS. 
-1. A free Makerflow account. Sign up at https://makerflow.co
-1. API token from https://app.makerflow.co/settings#api
 
 ## Installation
 
@@ -36,6 +41,12 @@ Once installed, run
 1. `makerflow config token` to set your API token.
 2. `makerflow config kill` to set which apps are automatically closed when Flow Mode is started and reopened 
 when it is ended
+
+### Pre-requisites
+
+1. MacOS. 
+1. A free Makerflow account. Sign up at https://makerflow.co
+1. API token from https://app.makerflow.co/settings#api
 
 ## Usage
 
