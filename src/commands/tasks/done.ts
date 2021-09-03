@@ -6,8 +6,16 @@ import { MultiSelect } from 'enquirer/lib/prompts'
 
 const command: GluegunCommand = {
   name: 'done',
-  description: 'Get a list of pending tasks from other apps like messages in Slack or pull requests in GitHub/Bitbucket and mark them as done',
+  description: 'Get a list of pending tasks like messages in Slack or pull requests in GitHub/Bitbucket and mark them as done',
   run: async toolbox => {
+    if (toolbox.parameters.options.help) {
+      toolbox.print.info("==================")
+      toolbox.print.info("Mark tasks as done")
+      toolbox.print.info("==================")
+      toolbox.print.info("See a list of pending tasks like messages in Slack or pull requests from GitHub/Bitbucket.")
+      toolbox.print.info("Select one or more tasks with spacebar and hit enter to mark them as done.")
+      return;
+    }
     let todo = null
     if (toolbox.parameters.options.hasOwnProperty("value") && toolbox.parameters.options.value) {
       todo = toolbox.parameters.options.value;
