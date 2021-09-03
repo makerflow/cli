@@ -9,6 +9,8 @@ import { formatDistanceStrict, isAfter, isBefore, isSameMinute, parseJSON } from
 
 const API_TOKEN_UNAVAILABLE = 'API token not available'
 const CONFIG_FILENAME = homedir() + '/.makerflowrc.json'
+const pathToKilledAppsList = `/tmp/makerflow-kill.txt`
+
 module.exports = (toolbox: GluegunToolbox) => {
 
   class MakerflowApiResult {
@@ -82,8 +84,14 @@ module.exports = (toolbox: GluegunToolbox) => {
       if (config.alwaysKill || toolbox.parameters.options.kill) {
         let appsToKill = config.appsToKill
         for (const app of appsToKill) {
-          // tslint:disable-next-line:no-floating-promises
-          toolbox.system.run(`pkill ${app}`)
+          toolbox.system.run(`pgrep "${app}"`).then(output => {
+            if (output && output.trim().length > 0) {
+              // tslint:disable-next-line:no-floating-promises
+              toolbox.system.run(`pkill "${app}"`).then(() => {
+                toolbox.filesystem.appendAsync(pathToKilledAppsList, app);
+              })
+            }
+          }).catch(() => {/* do nothing */})
         }
       }
     }
@@ -98,12 +106,16 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (error === null && response.status >= 200 && response.status < 300) {
       dnd.disable()
       let config = toolbox.mfConfig()
-      if (config.alwaysKill || toolbox.parameters.options.reopen) {
+      if ((config.alwaysKill || toolbox.parameters.options.kill) && toolbox.filesystem.exists(pathToKilledAppsList)) {
         let appsToKill = config.appsToKill
+        const killedApps = toolbox.filesystem.read(pathToKilledAppsList)
         for (const app of appsToKill) {
-          // tslint:disable-next-line:no-floating-promises
-          toolbox.system.run(`open /Applications/${app}.app`)
+          if (killedApps.indexOf(app) !== -1) {
+            // tslint:disable-next-line:no-floating-promises
+            toolbox.system.run(`open "/Applications/${app}.app"`)
+          }
         }
+        toolbox.filesystem.removeAsync(pathToKilledAppsList)
       }
     }
   }
