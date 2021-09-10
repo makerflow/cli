@@ -1,6 +1,6 @@
 {
   "name": "makerflow-cli",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Block distractions and get all your notifications/tasks in one place from other collaboration apps like messages from Slack and pull requests from GitHub or Bitbucket.",
   "private": false,
   "keywords": [

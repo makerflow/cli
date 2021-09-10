@@ -175,11 +175,9 @@ module.exports = (toolbox: GluegunToolbox) => {
     const startingMessage = 'Starting your break'
     const successMessage = 'Break started.'
     const url = '/work-break/start'
-    let data = null
+    let data = { reason:  'no-reason'}
     if (toolbox.parameters.options.hasOwnProperty('reason')) {
-      data = {
-        reason: toolbox.parameters.options.reason
-      }
+      data.reason = toolbox.parameters.options.reason
     }
     const { error } = await toolbox.postApi(startingMessage, url, successMessage, data)
     apiTokenUnavailableMessage(error)
