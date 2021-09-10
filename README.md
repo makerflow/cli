@@ -13,7 +13,7 @@ hiding away from your product manager, designer or other developers on the team!
    1. [Flow Mode](#flow-mode)
    1. [Tasks](#tasks)
    1. [Breaks](#breaks)
-   1. [Events](#events-from-google-calendar)
+   1. [Events (from Google Calendar)](#events-from-google-calendar)
 
 ## Features
 
@@ -74,6 +74,11 @@ Stopping Flow Mode will reverse all the above actions.
 
 `makerflow toggle --kill` - Start/stop Flow Mode and close/open chat apps. Only apps that were closed at the time of starting Flow Mode are reopened.
 
+#### Demo
+
+![](docs/media/toggle-demo.gif)
+
+
 ### Tasks
 
 Tasks show up in Makerflow by connecting with your other collaboration tools like Slack, GitHub or Bitbucket.
@@ -85,6 +90,11 @@ You can connect these tools with Makerflow from the "[Setup Integrations](https:
 `makerflow tasks todo` - See a list of pending tasks like messages in Slack or pull requests from GitHub/Bitbucket.
 
 `makerflow tasks done` - list notifications/pull requests and mark one or more tasks as done
+
+#### Demo
+
+![](docs/media/tasks-demo.gif)
+
 
 ### Breaks
 
@@ -110,9 +120,19 @@ child (👶), and doctor (🏥).
 
 `makerflow break stop` - Finish your break. Slack status is cleared.
 
+#### Demo
+
+![](docs/media/break-demo.gif)
+
+
 ### Events (from Google Calendar)
 
 `makerflow events list` will list recently ended, ongoing and upcoming events from Google Calendar.
+
+#### Demo
+
+![](docs/media/events-demo.gif)
+
 
 ## Upcoming
 
