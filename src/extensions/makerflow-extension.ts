@@ -201,7 +201,7 @@ module.exports = (toolbox: GluegunToolbox) => {
     const { print, parameters } = toolbox
     if (error === null && response.ok) {
       if (parameters.options.json) return
-      if (response.data !== null && response.data.length > 0) {
+      if (response.data !== null && response.data.hasOwnProperty('id')) {
         print.success('A break is currently in progress')
       } else {
         print.success('Not currently taking a break')
