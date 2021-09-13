@@ -33,8 +33,12 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (!parameters.options.json) {
       spinner = print.spin(startingMessage)
     }
+    let source = 'cli'
+    if (parameters.options.hasOwnProperty('source') && parameters.options.source.trim().length > 0) {
+      source = parameters.options.source;
+    }
     const api = toolbox.http.create({ baseURL: 'https://app.makerflow.co/api/' })
-    let config = { method: method, url: `${url}?api_token=${apiToken}` }
+    let config = { method: method, url: `${url}?api_token=${apiToken}&source=${source}` }
     if (data) {
       config['data'] = data
     }
