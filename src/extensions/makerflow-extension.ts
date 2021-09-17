@@ -1,11 +1,19 @@
-import { GluegunParameters, GluegunToolbox } from 'gluegun'
+import { GluegunParameters, GluegunPrint, GluegunToolbox } from 'gluegun'
 import * as dnd from '../do-not-disturb'
 import * as keytar from 'keytar'
 import { ApiResponse } from 'apisauce'
 import { homedir } from 'os'
 import TodoUtils from './todo-utils'
 import { capitalize } from 'lodash'
-import { formatDistanceStrict, isAfter, isBefore, isSameMinute, parseJSON } from 'date-fns'
+import {
+  compareAsc,
+  differenceInMinutes,
+  formatDistanceStrict,
+  isAfter,
+  isBefore,
+  isSameMinute,
+  parseJSON
+} from 'date-fns'
 
 const API_TOKEN_UNAVAILABLE = 'API token not available'
 const CONFIG_FILENAME = homedir() + '/.makerflowrc.json'
@@ -268,6 +276,74 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
   }
 
+  function tryToOpenGoogleMeet(print: GluegunPrint, event) {
+    print.info('Opening Google Meet for ' + event.summary)
+    const url = getVideoUriFromCalendarEvent(event)
+    if (url) {
+      toolbox.system.run('open ' + url)
+        .then(() => print.success("Opened " + url))
+        .catch(() => print.error("Error encountered while opening URL " + url))
+    } else {
+      print.info('Google Meet URL not found for ' + event.summary)
+    }
+  }
+
+  function printGoogleMeetUrls(print: GluegunPrint, status: string, ongoing: any[]) {
+    print.info(`Multiple ${status} events found. Please use URL to open the one you want`)
+    let output = [
+      ['Status', 'Time', 'Title', 'Video Link']
+    ]
+    for (const event of ongoing) {
+      let uri = getVideoUriFromCalendarEvent(event)
+      output.push([calendarEventOngoingUpcoming(event), formatCalendarTime(event), event.summary, uri])
+    }
+    toolbox.print.table(output, { format: 'markdown' })
+  }
+
+  toolbox.openCalendarEvent = async () => {
+    const startingMessage = 'Opening your calendar event'
+    const url = '/tasks/calendar/events'
+    const { error, response } = await toolbox.getApi(startingMessage, url, null)
+    apiTokenUnavailableMessage(error)
+    const { print, parameters } = toolbox
+    if (parameters.options.json) return
+    if (error === null && response.ok) {
+      if (response.data !== null && response.data.hasOwnProperty("events") && response.data.events.length > 0) {
+        let upcoming = []
+        let ongoing = []
+        for (const event of response.data.events.sort((a, b) => compareAsc(parseJSON(a.start), parseJSON(b.start)))) {
+          const status = calendarEventOngoingUpcoming(event)
+          if (status === "Ongoing" && differenceInMinutes(parseJSON(event.end), Date.now()) > 1) {
+            ongoing.push(event)
+          } else if (status === "Upcoming") {
+            upcoming.push(event)
+          }
+        }
+        if (ongoing.length === 1) {
+          const event = ongoing[0]
+          tryToOpenGoogleMeet(print, event)
+        } else if (ongoing.length > 1) {
+          const status = `ongoing`
+          printGoogleMeetUrls(print, status, ongoing)
+        } else if (upcoming.length > 0) {
+          const eventsStartingInLessThanFiveMinutes = upcoming.filter(event => differenceInMinutes(Date.now(), parseJSON(event.start)) <= 5)
+          if (eventsStartingInLessThanFiveMinutes.length === 1) {
+            tryToOpenGoogleMeet(print, eventsStartingInLessThanFiveMinutes[0])
+          } else if (eventsStartingInLessThanFiveMinutes.length > 1) {
+            const status = `upcoming`
+            printGoogleMeetUrls(print, status, eventsStartingInLessThanFiveMinutes)
+          } else {
+            print.info("No events found starting in the next 5 minutes")
+          }
+        } else {
+          print.success('No ongoing or upcoming events found')
+        }
+      } else {
+        print.error('There was an error connecting with your Calendar')
+      }
+    }
+  }
+
   toolbox.markAsDone = async (stringifiedTodo: string) => {
     const todo = JSON.parse(stringifiedTodo)
     if (!todo || !todo.hasOwnProperty('type')) return
@@ -310,9 +386,9 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
     if (isBefore(start, now)) {
       if (isAfter(end, now)) {
-        return "started " + formatDistanceStrict(start, now) + ", ending in " + formatDistanceStrict(now, end);
+        return "started " + formatDistanceStrict(start, now, {addSuffix: true}) + ", ending in " + formatDistanceStrict(now, end);
       } else {
-        return "ended " + formatDistanceStrict(now, end);
+        return "ended " + formatDistanceStrict(now, end, {addSuffix: true});
       }
     }
     if (isAfter(start, now)) {

@@ -30,7 +30,9 @@ hiding away from your product manager, designer or other developers on the team!
    1. Slack notifications
    1. pull requests from GitHub or Bitbucket
 1. ✅ and mark them as done (`makerflow tasks done`)
-1. 📅 See all your ongoing and upcoming [events from Google Calendar](#events-from-google-calendar) (`makerflow events list`)
+1. 📅 Interact with [events from Google Calendar](#events-from-google-calendar) by
+   1. listing them (`makerflow events list`)
+   1. or, joining them (`makerflow events join`)
 
 
 ## Installation
@@ -127,7 +129,12 @@ child (👶), and doctor (🏥).
 
 ### Events (from Google Calendar)
 
-`makerflow events list` will list recently ended, ongoing and upcoming events from Google Calendar.
+Interact with events from connected Google Calendars. You can your calendars with Makerflow from the 
+"[Setup Integrations](https://app.makerflow.co/integrations)" page on the website.
+
+#### Commands
+`makerflow events list` - will list recently ended, ongoing and upcoming events from Google Calendar.
+`makerflow events join` - will open a currently ongoing event's, or, the next upcoming event's Google Meet
 
 #### Demo
 
