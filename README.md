@@ -103,8 +103,6 @@ You can connect these tools with Makerflow from the "[Setup Integrations](https:
 Breaks are a quick way to set your Slack status and let your coworkers know when you are 
 away on a break.
 
-To go on a break, run `makerflow break start` and to end it, run `makerflow break stop`.
-
 ##### Providing type of break
 
 If you pass a `--reason` argument, Makerflow will automatically set an appropriate status and emoji 

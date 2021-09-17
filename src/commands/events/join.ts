@@ -4,6 +4,7 @@ import { GluegunCommand } from 'gluegun'
 
 const command: GluegunCommand = {
   name: 'join',
+  alias: 'j',
   description: 'Join currently ongoing or the next upcoming event\'s Google Meet',
   run: async toolbox => {
     if (toolbox.parameters.options.help) {

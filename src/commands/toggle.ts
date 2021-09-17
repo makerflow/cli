@@ -4,6 +4,7 @@ import { GluegunCommand } from 'gluegun'
 
 const command: GluegunCommand = {
   name: 'toggle',
+  alias: ["ft", "flow"],
   description: 'Start or end Flow Mode to do deep work by blocking distractions and notifications.',
   run: async toolbox => {
     if (toolbox.parameters.options.help) {

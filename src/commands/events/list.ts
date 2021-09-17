@@ -4,6 +4,7 @@ import { GluegunCommand } from 'gluegun'
 
 const command: GluegunCommand = {
   name: 'list',
+  alias: 'l',
   description: 'See ongoing and upcoming events from Google Calendar for the next three hours',
   run: async toolbox => {
     if (toolbox.parameters.options.help) {

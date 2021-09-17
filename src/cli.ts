@@ -8,6 +8,9 @@ async function run(argv) {
   const cli = build()
     .brand('makerflow')
     .src(__dirname)
+    .defaultCommand(toolbox =>
+      toolbox.print.info("Run 'makerflow --help' for more information")
+    )
     .help(toolbox => {
       toolbox.print.info('Makerflow CLI 💻 🌊')
       toolbox.print.info('===================')
