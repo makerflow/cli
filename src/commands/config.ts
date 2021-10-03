@@ -11,7 +11,7 @@ const command: GluegunCommand = {
     toolbox.print.info("======")
     toolbox.print.info("Config")
     toolbox.print.info("======\n")
-    toolbox.print.info("Run 'makerflow config toke --help' or 'makerflow config kill --help' for more information")
+    toolbox.print.info("Run 'makerflow config token --help' or 'makerflow config kill --help' for more information")
   },
 }
 
