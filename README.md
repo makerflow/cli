@@ -133,6 +133,7 @@ Interact with events from connected Google Calendars. You can your calendars wit
 #### Commands
 `makerflow events list` - will list recently ended, ongoing and upcoming events from Google Calendar.
 `makerflow events join` - will open a currently ongoing event's, or, the next upcoming event's Google Meet
+`makerflow events join --next --wait` - Open next event's Google Meet when the event starts
 
 #### Demo
 

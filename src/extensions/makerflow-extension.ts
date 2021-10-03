@@ -4,16 +4,19 @@ import * as keytar from 'keytar'
 import { ApiResponse } from 'apisauce'
 import { homedir } from 'os'
 import TodoUtils from './todo-utils'
-import { capitalize } from 'lodash'
+import { capitalize, findIndex } from 'lodash'
 import {
   compareAsc,
+  differenceInMilliseconds,
   differenceInMinutes,
+  differenceInSeconds,
   formatDistanceStrict,
   isAfter,
   isBefore,
   isSameMinute,
   parseJSON
 } from 'date-fns'
+import { utcToZonedTime } from 'date-fns-tz'
 
 const API_TOKEN_UNAVAILABLE = 'API token not available'
 const CONFIG_FILENAME = homedir() + '/.makerflowrc.json'
@@ -145,7 +148,7 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (error === null && response.status >= 200 && response.status < 300) {
       if (parameters.options.json) return
       if (response.data !== null && response.data.data.hasOwnProperty('id')) {
-        print.success('Flow Mode is currently ongoing')
+        print.success(`Flow Mode is currently ongoing. Started ${formatDistanceStrict(parseJSON(response.data.data.start), Date.now(), {addSuffix: true})}`)
       } else {
         print.success('No Flow Mode currently ongoing')
       }
@@ -276,28 +279,56 @@ module.exports = (toolbox: GluegunToolbox) => {
     }
   }
 
-  function tryToOpenGoogleMeet(print: GluegunPrint, event) {
-    print.info('Opening Google Meet for ' + event.summary)
+  function tryToOpenGoogleMeet(print: GluegunPrint, event, wait: boolean) {
     const url = getVideoUriFromCalendarEvent(event)
-    if (url) {
-      toolbox.system.run('open ' + url)
-        .then(() => print.success("Opened " + url))
-        .catch(() => print.error("Error encountered while opening URL " + url))
+    const status = calendarEventOngoingUpcoming(event)
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const eventStart = utcToZonedTime(parseJSON(event.start), timeZone);
+    if (url && (status === "Ongoing" || !wait)) {
+      print.info('Opening Google Meet for ' + event.summary)
+      openGoogleMeet(url, print)
+    } else if (url && status === "Upcoming" && wait) {
+      const spinner = print.spin(`Opening Google Meet (${url}) for event titled "${event.summary}" in ${differenceInSeconds(eventStart, Date.now())} seconds`)
+      const printer = setInterval(() => {
+        spinner.text = print.colors.info(`Opening Google Meet (${url}) for event titled "${event.summary}"" in ${differenceInSeconds(eventStart, Date.now())} seconds`)
+      }, 1000)
+      const milis = differenceInMilliseconds(eventStart, Date.now())
+      setTimeout(() => {
+        clearInterval(printer)
+        spinner.succeed(`Opening Google Meet (${url}) for event titled "${event.summary}"`)
+        openGoogleMeet(url, print)
+      }, milis)
     } else {
       print.info('Google Meet URL not found for ' + event.summary)
     }
   }
 
-  function printGoogleMeetUrls(print: GluegunPrint, status: string, ongoing: any[]) {
-    print.info(`Multiple ${status} events found. Please use URL to open the one you want`)
-    let output = [
-      ['Status', 'Time', 'Title', 'Video Link']
-    ]
-    for (const event of ongoing) {
+  function openGoogleMeet(url: any, print: GluegunPrint) {
+    toolbox.system.run('open ' + url)
+      .then(() => print.success("Opened " + url))
+      .catch(() => print.error("Error encountered while opening URL " + url))
+  }
+
+  async function printGoogleMeetUrls(print: GluegunPrint, status: string, events: any[], wait: boolean) {
+    let choices = []
+    for (const event of events) {
       let uri = getVideoUriFromCalendarEvent(event)
-      output.push([calendarEventOngoingUpcoming(event), formatCalendarTime(event), event.summary, uri])
+      choices.push(calendarEventOngoingUpcoming(event) + " | " + formatCalendarTime(event) + " | " + event.summary + " | " + uri)
     }
-    toolbox.print.table(output, { format: 'markdown' })
+    const response = await toolbox.prompt.ask({
+      type: 'select',
+      separator: true,
+      choices,
+      message: `Multiple ${status} events found. Please select one to open.`,
+      name: 'eventToOpen'
+    })
+    if (typeof response.eventToOpen !== "string" || response.eventToOpen.length === 0) {
+      print.error("Invalid choice")
+      return;
+    }
+    const eventIndex = findIndex(choices, (c: any) => c.value.trim() === response.eventToOpen.trim())
+    const event = events[eventIndex];
+    tryToOpenGoogleMeet(print, event, wait);
   }
 
   toolbox.openCalendarEvent = async () => {
@@ -319,19 +350,19 @@ module.exports = (toolbox: GluegunToolbox) => {
             upcoming.push(event)
           }
         }
-        if (ongoing.length === 1) {
+        if (ongoing.length === 1 && !parameters.options.next) {
           const event = ongoing[0]
-          tryToOpenGoogleMeet(print, event)
-        } else if (ongoing.length > 1) {
+          tryToOpenGoogleMeet(print, event, false)
+        } else if (ongoing.length > 1 && !parameters.options.next) {
           const status = `ongoing`
-          printGoogleMeetUrls(print, status, ongoing)
-        } else if (upcoming.length > 0) {
+          printGoogleMeetUrls(print, status, ongoing, false)
+        } else if (upcoming.length > 0 || parameters.options.next) {
           const eventsStartingInLessThanFiveMinutes = upcoming.filter(event => differenceInMinutes(Date.now(), parseJSON(event.start)) <= 5)
           if (eventsStartingInLessThanFiveMinutes.length === 1) {
-            tryToOpenGoogleMeet(print, eventsStartingInLessThanFiveMinutes[0])
+            tryToOpenGoogleMeet(print, eventsStartingInLessThanFiveMinutes[0], parameters.options.wait)
           } else if (eventsStartingInLessThanFiveMinutes.length > 1) {
             const status = `upcoming`
-            printGoogleMeetUrls(print, status, eventsStartingInLessThanFiveMinutes)
+            printGoogleMeetUrls(print, status, eventsStartingInLessThanFiveMinutes, parameters.options.wait)
           } else {
             print.info("No events found starting in the next 5 minutes")
           }
