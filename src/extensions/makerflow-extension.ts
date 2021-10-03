@@ -355,14 +355,14 @@ module.exports = (toolbox: GluegunToolbox) => {
           tryToOpenGoogleMeet(print, event, false)
         } else if (ongoing.length > 1 && !parameters.options.next) {
           const status = `ongoing`
-          printGoogleMeetUrls(print, status, ongoing, false)
+          await printGoogleMeetUrls(print, status, ongoing, false)
         } else if (upcoming.length > 0 || parameters.options.next) {
           const eventsStartingInLessThanFiveMinutes = upcoming.filter(event => differenceInMinutes(Date.now(), parseJSON(event.start)) <= 5)
           if (eventsStartingInLessThanFiveMinutes.length === 1) {
             tryToOpenGoogleMeet(print, eventsStartingInLessThanFiveMinutes[0], parameters.options.wait)
           } else if (eventsStartingInLessThanFiveMinutes.length > 1) {
             const status = `upcoming`
-            printGoogleMeetUrls(print, status, eventsStartingInLessThanFiveMinutes, parameters.options.wait)
+            await printGoogleMeetUrls(print, status, eventsStartingInLessThanFiveMinutes, parameters.options.wait)
           } else {
             print.info("No events found starting in the next 5 minutes")
           }
