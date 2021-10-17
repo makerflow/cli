@@ -93,9 +93,10 @@ module.exports = (toolbox: GluegunToolbox) => {
     let error = null
     let response = null
     if (!toolbox.parameters.options.clientOnly) {
-      const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
-      error = rerror
-      response = rresponse
+      const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
+      error = result.error
+      response = result.response
+      toolbox.print.debug(response)
       apiTokenUnavailableMessage(error)
     } else if (!toolbox.parameters.options.json) {
       toolbox.print.info(successMessage)
@@ -127,9 +128,9 @@ module.exports = (toolbox: GluegunToolbox) => {
     let error = null
     let response = null
     if (!toolbox.parameters.options.clientOnly) {
-      const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/stop', successMessage)
-      error = rerror
-      response = rresponse
+      const result = await toolbox.postApi(startingMessage, '/flow-mode/stop', successMessage)
+      error = result.error
+      response = result.response
       apiTokenUnavailableMessage(error)
     } else if (!toolbox.parameters.options.json) {
       toolbox.print.info(successMessage)
