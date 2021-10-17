@@ -90,10 +90,16 @@ module.exports = (toolbox: GluegunToolbox) => {
   toolbox.beginFlowMode = async () => {
     const startingMessage = 'Starting flow mode'
     const successMessage = 'Flow mode started.'
-    const url = '/flow-mode/start'
-    const { error, response } = await toolbox.postApi(startingMessage, url, successMessage)
-    apiTokenUnavailableMessage(error)
-    if (error == null && response.status >= 200 && response.status < 300) {
+    let error, response = null
+    if (!toolbox.parameters.options.clientOnly) {
+      const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
+      error = rerror
+      response = rresponse
+      apiTokenUnavailableMessage(error)
+    } else if (!toolbox.parameters.options.json) {
+      toolbox.print.info(successMessage)
+    }
+    if (toolbox.parameters.options.clientOnly || (error == null && response.status >= 200 && response.status < 300)) {
       dnd.enable()
       let config = toolbox.mfConfig()
       if (config.alwaysKill || toolbox.parameters.options.kill) {
@@ -117,10 +123,16 @@ module.exports = (toolbox: GluegunToolbox) => {
   toolbox.endFlowMode = async () => {
     const startingMessage = 'Stopping flow mode'
     const successMessage = 'Flow mode stopped.'
-    const url = '/flow-mode/stop'
-    const { error, response } = await toolbox.postApi(startingMessage, url, successMessage)
-    apiTokenUnavailableMessage(error)
-    if (error === null && response.status >= 200 && response.status < 300) {
+    let error, response = null
+    if (!toolbox.parameters.options.clientOnly) {
+      const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/stop', successMessage)
+      error = rerror
+      response = rresponse
+      apiTokenUnavailableMessage(error)
+    } else if (!toolbox.parameters.options.json) {
+      toolbox.print.info(successMessage)
+    }
+    if (toolbox.parameters.options.clientOnly || (error === null && response.status >= 200 && response.status < 300)) {
       dnd.disable()
       let config = toolbox.mfConfig()
       if ((config.alwaysKill || toolbox.parameters.options.kill) && toolbox.filesystem.exists(pathToKilledAppsList)) {
