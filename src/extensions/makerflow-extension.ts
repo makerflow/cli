@@ -90,7 +90,8 @@ module.exports = (toolbox: GluegunToolbox) => {
   toolbox.beginFlowMode = async () => {
     const startingMessage = 'Starting flow mode'
     const successMessage = 'Flow mode started.'
-    let error, response = null
+    let error = null
+    let response = null
     if (!toolbox.parameters.options.clientOnly) {
       const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
       error = rerror
@@ -123,7 +124,8 @@ module.exports = (toolbox: GluegunToolbox) => {
   toolbox.endFlowMode = async () => {
     const startingMessage = 'Stopping flow mode'
     const successMessage = 'Flow mode stopped.'
-    let error, response = null
+    let error = null
+    let response = null
     if (!toolbox.parameters.options.clientOnly) {
       const { rerror, rresponse } = await toolbox.postApi(startingMessage, '/flow-mode/stop', successMessage)
       error = rerror
