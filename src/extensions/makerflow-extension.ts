@@ -16,7 +16,7 @@ import {
   isSameMinute,
   parseJSON
 } from 'date-fns'
-import { utcToZonedTime } from 'date-fns-tz'
+import { format, utcToZonedTime } from 'date-fns-tz'
 
 const API_TOKEN_UNAVAILABLE = 'API token not available'
 const CONFIG_FILENAME = homedir() + '/.makerflowrc.json'
@@ -427,18 +427,19 @@ module.exports = (toolbox: GluegunToolbox) => {
     const now = Date.now();
     const start = parseJSON(calendarEvent.start);
     const end = parseJSON(calendarEvent.end)
+    let time = `${format(start, 'hh:mm aaa')} - ${format(end, 'hh:mm aaa')} | `
     if (isSameMinute(start, now)) {
-      return "is starting now" + ", ending in "  + formatDistanceStrict(now, end);
+      return time + "is starting now" + " | ending in "  + formatDistanceStrict(now, end);
     }
     if (isBefore(start, now)) {
       if (isAfter(end, now)) {
-        return "started " + formatDistanceStrict(start, now, {addSuffix: true}) + ", ending in " + formatDistanceStrict(now, end);
+        return time + "started " + formatDistanceStrict(start, now, {addSuffix: true}) + " | ending in " + formatDistanceStrict(now, end);
       } else {
-        return "ended " + formatDistanceStrict(now, end, {addSuffix: true});
+        return time + "ended " + formatDistanceStrict(now, end, {addSuffix: true});
       }
     }
     if (isAfter(start, now)) {
-      return "starting in " + formatDistanceStrict(now, start);
+      return time + "starting in " + formatDistanceStrict(now, start);
     }
   }
 
