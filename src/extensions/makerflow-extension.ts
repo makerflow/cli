@@ -190,7 +190,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       filesystem: { write, exists }
     } = toolbox
     if (!exists(CONFIG_FILENAME)) {
-      write(CONFIG_FILENAME, { alwaysKill: false, appsToKill: [] })
+      write(CONFIG_FILENAME, { alwaysKill: false, appsToKill: [], credentialsSetup: false })
     }
     return loadConfig(brand, homedir())
   }

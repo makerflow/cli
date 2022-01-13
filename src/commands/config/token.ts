@@ -16,16 +16,24 @@ const command: GluegunCommand = {
       return;
     }
     let token = null;
+    let config = toolbox.mfConfig();
     if (toolbox.parameters.options.hasOwnProperty("check") && toolbox.parameters.options.check) {
-      const pwd = await getPassword('makerflow', 'default')
-      let passwordExists = pwd !== null && pwd.trim().length > 5
+      let passwordExists = false;
+      if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
+        const pwd = await getPassword('makerflow', 'default')
+        passwordExists = pwd !== null && pwd.trim().length > 5
+      }
       toolbox.print.success(passwordExists)
       return;
     }
     if (toolbox.parameters.options.hasOwnProperty("delete") && toolbox.parameters.options.delete) {
-      const spinner = toolbox.print.spin('Deleting token...')
-      await deletePassword('makerflow', 'default')
-      spinner.succeed('Token deleted')
+      if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
+        const spinner = toolbox.print.spin('Deleting token...')
+        await deletePassword('makerflow', 'default')
+        spinner.succeed('Token deleted')
+      } else {
+        toolbox.print.error("No token to delete.")
+      }
       return;
     }
     if (toolbox.parameters.options.hasOwnProperty("value") && toolbox.parameters.options.value) {
@@ -42,6 +50,7 @@ const command: GluegunCommand = {
     if (token) {
       const spinner = toolbox.print.spin('Saving token...')
       await setPassword('makerflow', 'default', token)
+      toolbox.updateMfConfig('credentialsSetup', true)
       spinner.succeed('Token saved')
     }
   },
