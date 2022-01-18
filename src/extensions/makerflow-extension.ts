@@ -17,6 +17,7 @@ import {
   parseJSON
 } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
+import { setPassword, getPassword, deletePassword } from 'keytar'
 
 const API_TOKEN_UNAVAILABLE = 'API token not available'
 const CONFIG_FILENAME = homedir() + '/.makerflowrc.json'
@@ -449,5 +450,44 @@ module.exports = (toolbox: GluegunToolbox) => {
     apiTokenUnavailableMessage(error)
   }
 
-
+  toolbox.setupApiToken = async () => {
+    let token = null;
+    let config = toolbox.mfConfig();
+    if (toolbox.parameters.options.hasOwnProperty("check") && toolbox.parameters.options.check) {
+      let passwordExists = false;
+      if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
+        const pwd = await getPassword('makerflow', 'default')
+        passwordExists = pwd !== null && pwd.trim().length > 5
+      }
+      toolbox.print.success(passwordExists)
+      return;
+    }
+    if (toolbox.parameters.options.hasOwnProperty("delete") && toolbox.parameters.options.delete) {
+      if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
+        const spinner = toolbox.print.spin('Deleting token...')
+        await deletePassword('makerflow', 'default')
+        spinner.succeed('Token deleted')
+      } else {
+        toolbox.print.error("No token to delete.")
+      }
+      return;
+    }
+    if (toolbox.parameters.options.hasOwnProperty("value") && toolbox.parameters.options.value) {
+      token = toolbox.parameters.options.value;
+    }
+    if (token === null) {
+      const response = await toolbox.prompt.ask([{
+        type: 'password',
+        name: 'token',
+        message: 'Enter your API Token. You can get a new token from https://app.makerflow.co/settings#api'
+      }])
+      token = response.token
+    }
+    if (token) {
+      const spinner = toolbox.print.spin('Saving token...')
+      await setPassword('makerflow', 'default', token)
+      toolbox.updateMfConfig('credentialsSetup', true)
+      spinner.succeed('Token saved')
+    }
+  }
 }
