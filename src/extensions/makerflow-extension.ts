@@ -1,6 +1,5 @@
 import { GluegunParameters, GluegunPrint, GluegunToolbox } from 'gluegun'
 import * as dnd from '../do-not-disturb'
-import * as keytar from 'keytar'
 import { ApiResponse } from 'apisauce'
 import { homedir } from 'os'
 import TodoUtils from './todo-utils'
@@ -38,8 +37,9 @@ module.exports = (toolbox: GluegunToolbox) => {
   async function executeApi(startingMessage: string, url: string, successMessage: string,
                             method: 'get' | 'GET' | 'delete' | 'DELETE' | 'head' | 'HEAD' | 'options' | 'OPTIONS' | 'post' | 'POST' | 'put' | 'PUT' | 'patch' | 'PATCH' | 'purge' | 'PURGE' | 'link' | 'LINK' | 'unlink' | 'UNLINK'
     , data: object): Promise<MakerflowApiResult> {
-    let apiToken = await keytar.getPassword('makerflow', 'default')
-    if (apiToken === null) return new MakerflowApiResult(Error(API_TOKEN_UNAVAILABLE), null)
+    let passwordExists = await toolbox.passwordExists()
+    if (!passwordExists) return new MakerflowApiResult(Error(API_TOKEN_UNAVAILABLE), null)
+    let apiToken = await getPassword('makerflow', 'default')
     const { print, parameters } = toolbox
     let spinner = null
     if (!parameters.options.json) {
@@ -97,7 +97,6 @@ module.exports = (toolbox: GluegunToolbox) => {
       const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
       error = result.error
       response = result.response
-      toolbox.print.debug(response)
       apiTokenUnavailableMessage(error)
     } else if (!toolbox.parameters.options.json) {
       toolbox.print.info(successMessage)
@@ -191,7 +190,14 @@ module.exports = (toolbox: GluegunToolbox) => {
       filesystem: { write, exists }
     } = toolbox
     if (!exists(CONFIG_FILENAME)) {
-      write(CONFIG_FILENAME, { alwaysKill: false, appsToKill: [], credentialsSetup: false })
+      write(CONFIG_FILENAME, {
+        alwaysKill: false,
+        appsToKill: [],
+        credentialsSetup: false,
+        onboarding: {
+          apiSetupComplete: true
+        }
+      })
     }
     return loadConfig(brand, homedir())
   }
@@ -327,9 +333,9 @@ module.exports = (toolbox: GluegunToolbox) => {
 
   async function printGoogleMeetUrls(print: GluegunPrint, status: string, events: any[], wait: boolean) {
     let choices = []
-    for (const event of events) {
-      let uri = getVideoUriFromCalendarEvent(event)
-      choices.push(calendarEventOngoingUpcoming(event) + " | " + formatCalendarTime(event) + " | " + event.summary + " | " + uri)
+    for (const thisEvent of events) {
+      let uri = getVideoUriFromCalendarEvent(thisEvent)
+      choices.push(calendarEventOngoingUpcoming(thisEvent) + " | " + formatCalendarTime(thisEvent) + " | " + thisEvent.summary + " | " + uri)
     }
     const response = await toolbox.prompt.ask({
       type: 'select',
@@ -450,17 +456,23 @@ module.exports = (toolbox: GluegunToolbox) => {
     apiTokenUnavailableMessage(error)
   }
 
+  toolbox.passwordExists = async () => {
+    let config = toolbox.mfConfig()
+    let passwordExists = false
+    if (config.hasOwnProperty('credentialsSetup') && config.credentialsSetup) {
+      const pwd = await getPassword('makerflow', 'default')
+      passwordExists = pwd !== null && pwd.trim().length > 5
+    }
+    return passwordExists
+  }
+
   toolbox.setupApiToken = async () => {
     let token = null;
     let config = toolbox.mfConfig();
     if (toolbox.parameters.options.hasOwnProperty("check") && toolbox.parameters.options.check) {
-      let passwordExists = false;
-      if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
-        const pwd = await getPassword('makerflow', 'default')
-        passwordExists = pwd !== null && pwd.trim().length > 5
-      }
+      let passwordExists = await toolbox.passwordExists()
       toolbox.print.success(passwordExists)
-      return;
+      return true;
     }
     if (toolbox.parameters.options.hasOwnProperty("delete") && toolbox.parameters.options.delete) {
       if (config.hasOwnProperty("credentialsSetup") && config.credentialsSetup) {
@@ -470,7 +482,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       } else {
         toolbox.print.error("No token to delete.")
       }
-      return;
+      return true;
     }
     if (toolbox.parameters.options.hasOwnProperty("value") && toolbox.parameters.options.value) {
       token = toolbox.parameters.options.value;
@@ -488,6 +500,50 @@ module.exports = (toolbox: GluegunToolbox) => {
       await setPassword('makerflow', 'default', token)
       toolbox.updateMfConfig('credentialsSetup', true)
       spinner.succeed('Token saved')
+      return true
+    }
+  }
+
+  const supportedApps = ["Slack", "Discord", "WhatsApp", "Telegram", "Microsoft Teams"]
+  toolbox.configureAppKilling = async () => {
+    const {
+      mfConfig,
+      print: { success },
+      updateMfConfig,
+      prompt
+    } = toolbox
+    let config = mfConfig()
+    let alwaysKill = config.alwaysKill;
+    const choices = supportedApps.filter(app => {
+      return toolbox.filesystem.exists(`/Applications/${app}.app`);
+    });
+    const alwaysKillOption = "Every time Flow Mode is started or stopped"
+    const userSpecifiedKillOption = "Only when Flow Mode is started or stopped with --kill option"
+    const result = await prompt.ask([
+      {
+        type: 'select',
+        name: 'alwaysKill',
+        message: "When would would you like to close/reopen distracting apps? You will select apps to close/reopen in the next step.",
+        choices: [alwaysKillOption, userSpecifiedKillOption],
+        initial: alwaysKill ? 0 : 1
+      },
+      {
+        type: 'multiselect',
+        name: 'appsToKill',
+        choices: choices,
+        message: "Which of these apps would you like to close? (select with spacebar, confirm with enter)",
+      }
+    ])
+    updateMfConfig('alwaysKill', result['alwaysKill'] === alwaysKillOption)
+    updateMfConfig('appsToKill', result['appsToKill'])
+    config = mfConfig()
+    if (config.alwaysKill && config.appsToKill.length > 0) {
+      success("Following apps will always be closed when Flow Mode has started, and reopened when it ends: " + config.appsToKill.join(", "))
+    } else if (config.appsToKill.length > 0) {
+      success("Following apps will be closed when Flow Mode has started with `makerflow toggle --kill` or `makerflow start --kill`: " + config.appsToKill.join(", "))
+      success("Following apps will be reopened when Flow Mode is ended with `makerflow toggle --kill` or `makerflow stop --kill`: " + config.appsToKill.join(", "))
+    } else {
+      success("No apps will be closed when Flow Mode has started, or reopened when it ends.")
     }
   }
 }
