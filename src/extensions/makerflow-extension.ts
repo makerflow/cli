@@ -442,7 +442,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       if (isAfter(end, now)) {
         return time + "started " + formatDistanceStrict(start, now, {addSuffix: true}) + " | ending in " + formatDistanceStrict(now, end);
       } else {
-        return time + "ended " + formatDistanceStrict(now, end, {addSuffix: true});
+        return time + "ended " + formatDistanceStrict(end, now, {addSuffix: true});
       }
     }
     if (isAfter(start, now)) {
