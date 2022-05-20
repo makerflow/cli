@@ -26,9 +26,7 @@ hiding away from your product manager, designer or other developers on the team!
    1. or, when you are on a [break](#breaks). Status is set to one of these emojis ☕️ 🍵 🥪 🥤 🚶 🏃 💪 🏥 👶 ⏸ ([more info](#providing-type-of-break))
 
 #### Plus, other commands to
-1. 📋 Get a list of your [tasks](#tasks) (`makerflow tasks todo`) like
-   1. Slack notifications
-   1. pull requests from GitHub or Bitbucket
+1. 📋 Get a list of your [tasks](#tasks) (`makerflow tasks todo`) like pull requests from GitHub or Bitbucket
 1. ✅ and mark them as done (`makerflow tasks done`)
 1. 📅 Interact with [events from Google Calendar](#events-from-google-calendar) by
    1. listing them (`makerflow events list`)
@@ -89,7 +87,7 @@ You can connect these tools with Makerflow from the "[Setup Integrations](https:
 
 #### Commands
 
-`makerflow tasks todo` - See a list of pending tasks like messages in Slack or pull requests from GitHub/Bitbucket.
+`makerflow tasks todo` - See a list of pending tasks like pull requests from GitHub/Bitbucket.
 
 `makerflow tasks done` - list notifications/pull requests and mark one or more tasks as done
 
