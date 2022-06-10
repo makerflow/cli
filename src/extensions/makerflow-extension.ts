@@ -261,7 +261,7 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (error === null && response.ok) {
       let formattedTodos = []
       if (response.data !== null && response.data.length > 0) {
-        formattedTodos = response.data.map(TodoUtils.enrichTodo)
+        formattedTodos = response.data.map(TodoUtils.enrichTodo).filter(t => t != null)
         formattedTodos = toolbox.filterTodosByType(parameters, formattedTodos)
         if (formattedTodos.length === 0) {
           print.success('No pending tasks')
