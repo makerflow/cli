@@ -37,9 +37,14 @@ module.exports = (toolbox: GluegunToolbox) => {
   async function executeApi(startingMessage: string, url: string, successMessage: string,
                             method: 'get' | 'GET' | 'delete' | 'DELETE' | 'head' | 'HEAD' | 'options' | 'OPTIONS' | 'post' | 'POST' | 'put' | 'PUT' | 'patch' | 'PATCH' | 'purge' | 'PURGE' | 'link' | 'LINK' | 'unlink' | 'UNLINK'
     , data: object): Promise<MakerflowApiResult> {
-    let passwordExists = await toolbox.passwordExists()
-    if (!passwordExists) return new MakerflowApiResult(Error(API_TOKEN_UNAVAILABLE), null)
-    let apiToken = await getPassword('makerflow', 'default')
+    let apiToken = null;
+    if (process.env.MAKERFLOW_API_TOKEN) {
+      apiToken = process.env.MAKERFLOW_API_TOKEN;
+    } else {
+      let passwordExists = await toolbox.passwordExists()
+      if (!passwordExists) return new MakerflowApiResult(Error(API_TOKEN_UNAVAILABLE), null)
+      apiToken = await getPassword('makerflow', 'default')
+    }
     const { print, parameters } = toolbox
     let spinner = null
     if (!parameters.options.json) {
@@ -49,7 +54,11 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (parameters.options.hasOwnProperty('source') && parameters.options.source.trim().length > 0) {
       source = parameters.options.source;
     }
-    const api = toolbox.http.create({ baseURL: 'https://app.makerflow.co/api/' })
+    let baseURL = 'https://app.makerflow.co/api/'
+    if (process.env.MAKERFLOW_API_URL) {
+      baseURL = process.env.MAKERFLOW_API_URL
+    }
+    const api = toolbox.http.create({ baseURL: baseURL })
     let config = { method: method, url: `${url}?api_token=${apiToken}&source=${source}` }
     if (data) {
       config['data'] = data
