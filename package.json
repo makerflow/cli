@@ -64,6 +64,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.11",
+    "caxa": "^2.1.0",
     "dotenv": "^16.0.1",
     "jest": "^24.1.0",
     "prettier": "^1.12.1",
@@ -81,5 +82,15 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "pkg": {
+    "scripts": [
+      "build/**/*.js",
+      "src/**/*.js"
+    ],
+    "targets": [
+      "node18-macos-x64"
+    ],
+    "outputPath": "dist"
   }
 }
