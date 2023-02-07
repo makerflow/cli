@@ -103,7 +103,11 @@ module.exports = (toolbox: GluegunToolbox) => {
     let error = null
     let response = null
     if (!toolbox.parameters.options.clientOnly) {
-      const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
+      let data = null
+      if (toolbox.parameters.options.hasOwnProperty('duration')) {
+        data = { duration: toolbox.parameters.options.duration }
+      }
+      const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage, data)
       error = result.error
       response = result.response
       apiTokenUnavailableMessage(error)
