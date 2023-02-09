@@ -98,12 +98,34 @@ module.exports = (toolbox: GluegunToolbox) => {
   }
 
   toolbox.beginFlowMode = async () => {
-    const startingMessage = 'Starting flow mode'
-    const successMessage = 'Flow mode started.'
+    let startingMessage = 'Starting flow mode'
+    let successMessage = 'Flow mode started'
     let error = null
     let response = null
     if (!toolbox.parameters.options.clientOnly) {
-      const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage)
+      let data = null
+      let config = toolbox.mfConfig()
+      toolbox.print.debug(toolbox.parameters.options)
+      toolbox.print.debug(toolbox.parameters.argv)
+      if (toolbox.parameters.options.duration || config.defaultDuration !== "None") {
+        let duration: string | boolean
+        if (!toolbox.parameters.options.duration &&
+           // gluegun will set toolbox.parameters.options.duration to false if the --no-duration flag is passed
+           // So we need to check for that
+           toolbox.parameters.argv.indexOf('--no-duration') !== -1) {
+          duration = false
+        } else if (toolbox.parameters.options.duration) {
+          duration = toolbox.parameters.options.duration
+        } else {
+          duration = config.defaultDuration
+        }
+        if (typeof duration === 'string') {
+          data = { duration: parseInt(duration) }
+          startingMessage += ` for ${duration} minutes`
+          successMessage += ` for ${duration} minutes.`
+        }
+      }
+      const result = await toolbox.postApi(startingMessage, '/flow-mode/start', successMessage, data)
       error = result.error
       response = result.response
       apiTokenUnavailableMessage(error)
@@ -133,7 +155,7 @@ module.exports = (toolbox: GluegunToolbox) => {
 
   toolbox.endFlowMode = async () => {
     const startingMessage = 'Stopping flow mode'
-    const successMessage = 'Flow mode stopped.'
+    const successMessage = 'Flow mode stopped'
     let error = null
     let response = null
     if (!toolbox.parameters.options.clientOnly) {
@@ -205,10 +227,34 @@ module.exports = (toolbox: GluegunToolbox) => {
         credentialsSetup: false,
         onboarding: {
           apiSetupComplete: true
-        }
+        },
+        defaultDuration: 'None'
       })
     }
-    return loadConfig(brand, homedir())
+    let config = loadConfig(brand, homedir())
+    if (!config.hasOwnProperty('alwaysKill')) {
+      config.alwaysKill = false
+      toolbox.filesystem.write(CONFIG_FILENAME, config)
+    }
+    if (!config.hasOwnProperty('appsToKill')) {
+      config.appsToKill = []
+      toolbox.filesystem.write(CONFIG_FILENAME, config)
+    }
+    if (!config.hasOwnProperty('credentialsSetup')) {
+      config.credentialsSetup = false
+      toolbox.filesystem.write(CONFIG_FILENAME, config)
+    }
+    if (!config.hasOwnProperty('onboarding')) {
+      config.onboarding = {
+        apiSetupComplete: true
+      }
+      toolbox.filesystem.write(CONFIG_FILENAME, config)
+    }
+    if (!config.hasOwnProperty('defaultDuration')) {
+      config.defaultDuration = 'None'
+      toolbox.filesystem.write(CONFIG_FILENAME, config)
+    }
+    return config
   }
 
   toolbox.updateMfConfig = async (key, value) => {
@@ -555,4 +601,38 @@ module.exports = (toolbox: GluegunToolbox) => {
       success("No apps will be closed when Flow Mode has started, or reopened when it ends.")
     }
   }
+
+  toolbox.setupDefaultDuration = async () => {
+    const {
+      mfConfig,
+      print: { success },
+      updateMfConfig,
+      prompt
+    } = toolbox
+    let config = mfConfig()
+    let defaultDuration = config.defaultDuration;
+    const result = await prompt.ask([
+      {
+        type: 'select',
+        name: 'defaultDuration',
+        message: "How long would you like your Flow Mode sessions to be (in minutes)? Choose None to manually disable Flow Mode.",
+        choices: ["None", "25", "50" , "75", "Other"],
+        initial: defaultDuration
+      }
+    ])
+    if (result['defaultDuration'] === "Other") {
+      const result2 = await prompt.ask([
+        {
+          type: 'input',
+          name: 'defaultDuration',
+          message: "How long would you like your default Flow Mode sessions to be? (in minutes)",
+        }
+      ])
+      updateMfConfig('defaultDuration', result2['defaultDuration'])
+    } else {
+      updateMfConfig('defaultDuration', result['defaultDuration'])
+    }
+    success("Default Flow Mode duration set to " + result['defaultDuration'] + " minutes.")
+  }
+
 }

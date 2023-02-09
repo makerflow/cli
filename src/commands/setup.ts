@@ -124,6 +124,8 @@ const command: GluegunCommand = {
     toolbox.print.info("\nNext, let's get some basic preferences setup for you.")
     await toolbox.configureAppKilling()
 
+    await toolbox.setupDefaultDuration()
+
     toolbox.print.success("Perfect, you are all setup! Run `makerflow --help` if you need any information")
   },
 }
