@@ -120,7 +120,7 @@ module.exports = (toolbox: GluegunToolbox) => {
           duration = config.defaultDuration
         }
         if (typeof duration === 'string') {
-          data = { duration: parseInt(duration) }
+          data = { duration: parseInt(duration, 10) }
           startingMessage += ` for ${duration} minutes`
           successMessage += ` for ${duration} minutes.`
         }
