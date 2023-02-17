@@ -105,8 +105,6 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (!toolbox.parameters.options.clientOnly) {
       let data = null
       let config = toolbox.mfConfig()
-      toolbox.print.debug(toolbox.parameters.options)
-      toolbox.print.debug(toolbox.parameters.argv)
       if (toolbox.parameters.options.duration || config.defaultDuration !== "None") {
         let duration: string | boolean
         if (!toolbox.parameters.options.duration &&
