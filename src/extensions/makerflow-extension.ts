@@ -105,7 +105,8 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (!toolbox.parameters.options.clientOnly) {
       let data = null
       let config = toolbox.mfConfig()
-      if (toolbox.parameters.options.duration || config.defaultDuration !== "None") {
+      if ((toolbox.parameters.options.hasOwnProperty("duration") && toolbox.parameters.options.duration !== null)
+          || config.defaultDuration !== "None") {
         let duration: string | boolean
         if (!toolbox.parameters.options.duration &&
            // gluegun will set toolbox.parameters.options.duration to false if the --no-duration flag is passed
@@ -117,7 +118,7 @@ module.exports = (toolbox: GluegunToolbox) => {
         } else {
           duration = config.defaultDuration
         }
-        if (typeof duration === 'string') {
+        if (typeof duration === 'string' || typeof duration === 'number') {
           data = { duration: parseInt(duration, 10) }
           startingMessage += ` for ${duration} minutes`
           successMessage += ` for ${duration} minutes.`
@@ -192,7 +193,12 @@ module.exports = (toolbox: GluegunToolbox) => {
     if (error === null && response.status >= 200 && response.status < 300) {
       if (parameters.options.json) return
       if (response.data !== null && response.data.data.hasOwnProperty('id')) {
-        print.success(`Flow Mode is currently ongoing. Started ${formatDistanceStrict(parseJSON(response.data.data.start), Date.now(), {addSuffix: true})}`)
+        let ongoingMessage = 'Flow Mode is currently ongoing'
+        ongoingMessage += `.\nStarted ${formatDistanceStrict(parseJSON(response.data.data.start), Date.now(), {addSuffix: true})}`
+        if (response.data.data.hasOwnProperty('scheduled_end')) {
+          ongoingMessage += `.\nEnding ${formatDistanceStrict(parseJSON(response.data.data.scheduled_end), Date.now(), {addSuffix: true})}.`
+        }
+        print.success(ongoingMessage)
       } else {
         print.success('No Flow Mode currently ongoing')
       }
